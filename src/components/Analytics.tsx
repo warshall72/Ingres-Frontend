@@ -242,7 +242,7 @@ export const Analytics = () => {
               </div>
               <div>
                 <h3 className="text-lg font-bold font-inter text-card-foreground">
-                  Forecasting Model
+                  Forecasting Model (Future Scope)
                 </h3>
                 <p className="text-sm text-muted-foreground">AI Predictions</p>
               </div>

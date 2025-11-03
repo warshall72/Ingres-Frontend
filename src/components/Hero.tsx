@@ -105,10 +105,7 @@ export const Hero = ({
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-          <Button onClick={onDemoClick} size="lg" className="group bg-teal-accent hover:bg-teal-accent/90 text-white font-semibold px-8 py-6 text-lg rounded-xl transition-smooth hover-lift shadow-teal">
-            <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-            Try Live Demo
-          </Button>
+          
 
           <Button
             onClick={() => navigate("/login")}

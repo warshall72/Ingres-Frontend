@@ -33,6 +33,7 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="chat" element={<ChatPage />} />
               <Route path="spaces" element={<SpacesPage />} />
+               <Route path="chat/:chatId" element={<ChatPage />} />
               <Route path="analysis" element={<AnalysisPage />} />
               <Route path="forecasting" element={<ForecastingPage />} />
               <Route path="settings" element={<SettingsPage />} />
@@ -40,6 +41,7 @@ const App = () => (
 
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
+            
           </Routes>
         </BrowserRouter>
       </AuthProvider>

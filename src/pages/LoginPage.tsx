@@ -3,18 +3,53 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Droplets } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
+import { BASE_URL } from "@/config";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleAuth = () => {
-    // mock login for now
-    navigate("/dashboard");
+  const handleAuth = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      const endpoint = isSignUp
+        ? `${BASE_URL}/auth/signup`
+        : `${BASE_URL}/auth/signin`;
+
+      const payload = isSignUp
+        ? { name, email, password }
+        : { email, password };
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Authentication failed");
+      }
+
+      // Optionally store token if backend returns one
+      if (data.token) localStorage.setItem("token", data.token);
+
+      navigate("/dashboard/chat");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // floating droplets data (spread randomly)
   const droplets = [
     { size: 10, x: "10%", y: "20%", delay: 0 },
     { size: 14, x: "30%", y: "70%", delay: 2 },
@@ -26,7 +61,7 @@ const LoginPage = () => {
 
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-teal-500 via-blue-500 to-teal-600">
-      {/* floating droplets in background */}
+      {/* floating droplets */}
       {droplets.map((drop, i) => (
         <motion.div
           key={i}
@@ -43,11 +78,9 @@ const LoginPage = () => {
       <div className="relative z-10 w-full max-w-md px-6">
         {/* Header */}
         <div className="text-center mb-10">
-          <h2 className="text-4xl font-bold text-white mb-4">
-           SWAGATAM 🙏🏼
-          </h2>
+          <h2 className="text-4xl font-bold text-white mb-4">SWAGATAM 🙏🏼</h2>
           <p className="text-lg text-white/80 leading-relaxed">
-            Dive into India’s groundwater insights with Hydro AI Talk.  
+            Dive into India’s groundwater insights with Hydro AI Talk.
             Sign in to explore, analyze, and forecast data effortlessly.
           </p>
         </div>
@@ -63,23 +96,34 @@ const LoginPage = () => {
             {isSignUp ? "Create Account" : "Let's Get you Logged in"}
           </h1>
 
+          {/* Error */}
+          {error && (
+            <p className="text-red-500 text-center text-sm mb-3">{error}</p>
+          )}
+
           {/* Form */}
           <div className="space-y-4">
             {isSignUp && (
               <input
                 type="text"
                 placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-teal-400 outline-none"
               />
             )}
             <input
               type="email"
               placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-teal-400 outline-none"
             />
             <input
               type="password"
               placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-teal-400 outline-none"
             />
           </div>
@@ -87,25 +131,14 @@ const LoginPage = () => {
           {/* Primary button */}
           <button
             onClick={handleAuth}
-            className="w-full mt-6 py-3 rounded-xl bg-teal-500 text-white font-semibold shadow-md hover:bg-teal-600 transition"
+            disabled={loading}
+            className="w-full mt-6 py-3 rounded-xl bg-teal-500 text-white font-semibold shadow-md hover:bg-teal-600 transition disabled:opacity-60"
           >
-            {isSignUp ? "Sign Up" : "Login"}
-          </button>
-
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-grow h-px bg-gray-300" />
-            <span className="px-3 text-gray-500 text-sm">or</span>
-            <div className="flex-grow h-px bg-gray-300" />
-          </div>
-
-          {/* Google login */}
-          <button
-            onClick={handleAuth}
-            className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium shadow hover:shadow-md transition"
-          >
-            <FcGoogle className="w-5 h-5" />
-            {isSignUp ? "Sign Up with Google" : "Sign In with Google"}
+            {loading
+              ? "Please wait..."
+              : isSignUp
+              ? "Sign Up"
+              : "Login"}
           </button>
 
           {/* Toggle link */}
